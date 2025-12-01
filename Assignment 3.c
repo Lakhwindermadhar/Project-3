@@ -126,7 +126,9 @@ int main(void) {
                 gets(searchCategory);
                 toLowerCase(searchCategory);
 
-                sprintf(filename, "%s_calls.txt", searchCategory);
+                strcpy(filename, searchCategory);   // copy category into filename
+                strcat(filename, "_calls.txt");     // append suffix
+
                 outFile = fopen(filename, "w");
 
                 if (outFile == NULL) {
@@ -165,7 +167,7 @@ int main(void) {
 
         case 5:
             printf("Exiting program. Goodbye!\n");
-            keepRunning = 0;  
+            keepRunning = 0;   
             break;
 
         default:

@@ -15,7 +15,6 @@ void toLowerCase(char str[]) {
     }
 }
 
-// Remove trailing newline from fgets
 void trimNewline(char str[]) {
     int len = strlen(str);
     if (len > 0 && str[len - 1] == '\n') {

@@ -1,0 +1,3 @@
+﻿  Assignment 3.c
+D:\seneca\BTP100 prog c\Assignment 3\Assignment 3.c(72,17): warning C4013: 'gets' undefined; assuming extern returning int
+  Assignment 3.vcxproj -> D:\seneca\BTP100 prog c\Assignment 3\x64\Debug\Assignment 3.exe

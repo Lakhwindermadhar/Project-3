@@ -1,196 +1,172 @@
-#define _CRT_SECURE_NO_WARNINGS
-#include <stdio.h>
-#include <string.h>
+#define _CRT_SECURE_NO_WARNINGS  // Disable warnings for unsafe functions 
 
-#define MAX_LINE 500   // maximum length of a line from the file
+#include <stdio.h>   // Standard Input/Output library
+#include <string.h>  // String manipulation functions
 
-// converts all uppercase letters in a string to lowercase
+#define MAX_LINE 500   // Maximum length of a line read from the file
+
+// Function: converts all uppercase letters in a string to lowercase
 void toLowerCase(char str[]) {
     int i = 0;
-    while (str[i] != '\0') {   // loop through each character
-        if (str[i] >= 'A' && str[i] <= 'Z') {  // if uppercase
-            str[i] = str[i] + 32;             // convert to lowercase
+    while (str[i] != '\0') {           // Loop through each character until end of string
+        if (str[i] >= 'A' && str[i] <= 'Z') {  // Check if character is uppercase
+            str[i] = str[i] + 32;     // Convert uppercase letter to lowercase
         }
-        i++;
-    }
-}
-
-// remove newline character from fgets input
-void trimNewline(char str[]) {
-    int len = strlen(str);
-    if (len > 0 && str[len - 1] == '\n') {   // check if last character is newline
-        str[len - 1] = '\0';                 // remove newline
+        i++;                           // Move to next character
     }
 }
 
 int main(void) {
-    FILE* fp = NULL;       // pointer for reading file
-    FILE* outFile = NULL;  // pointer for writing file
+    FILE* fp = NULL;       // File pointer for reading the input file
+    FILE* outFile = NULL;  // File pointer for writing filtered output file
 
-    int choice = 0;        // variable to store menu choice
-    int keepRunning = 1;   // loop control flag
-    int total = 0;         // counter for total number of Calls to Action
-    int found = 0;         // flag to indicate if a match is found
+    int choice = 0;        // Variable to store menu choice
+    int keepRunning = 1;   // Flag to control main menu loop
+    int total = 0;         // Counter for total number of Calls to Action
+    int found = 0;         // Flag indicating whether a search found matches
 
-    char line[MAX_LINE];       // buffer for reading each line from file
-    char category[50];         // extracted category from each line
-    char searchCategory[50];   // category input by user
-    char filename[60];         // output filename for saving filtered category
-    char tempLine[MAX_LINE];   // temporary buffer to safely manipulate strings
+    char line[MAX_LINE];       // Buffer to read each line from file
+    char category[50];         // Stores extracted category from each line
+    char searchCategory[50];   // Stores user input category for searching
+    char filename[60];         // Stores filename for saving filtered results
+    char tempLine[MAX_LINE];   // Temporary buffer for safe string manipulation
 
-    // main menu loop
+    // Main menu loop
     while (keepRunning == 1) {
-        // display menu
+        // Display menu options
         printf("\n------ MENU ------\n");
-        printf("1. Display all Calls to Action\n");
-        printf("2. Search Calls to Action by category\n");
-        printf("3. Display total number of Calls to Action\n");
-        printf("4. Save Calls to Action by category to a new file\n");
-        printf("5. Exit\n");
+        printf("1. Display all Calls to Action\n");  // Option 1
+        printf("2. Search Calls to Action by category\n");  // Option 2
+        printf("3. Display total number of Calls to Action\n");  // Option 3
+        printf("4. Save Calls to Action by category to a new file\n");  // Option 4
+        printf("5. Exit\n");  // Option 5
         printf("Enter your choice: ");
-        scanf("%d", &choice);   // read user choice
-        getchar();              // clear leftover newline from buffer
+        scanf("%d", &choice);   // Read user's menu choice
+        getchar();              // Remove leftover newline from input buffer
 
         switch (choice) {
-        // option 1: display all Calls to Action
+            // Option 1: Display all Calls to Action
         case 1:
-            fp = fopen("calls_to_action.txt", "r");  // open file for reading
-
-            if (fp == NULL) {  // check if file opened successfully
-                printf("Error: File cannot be opened.\n");
+            fp = fopen("calls_to_action.txt", "r");  // Open file in read mode
+            if (fp == NULL) {  // Check if file exists
+                printf("Error: File cannot be opened.\n");  // Print error if file not found
             }
             else {
                 printf("\n--- All Calls to Action ---\n\n");
-                // read and print each line until the end of the file
-                while (fgets(line, MAX_LINE, fp) != NULL) {
-                    printf("%s", line);
+                while (fgets(line, MAX_LINE, fp) != NULL) {  // Read each line until EOF
+                    printf("%s", line);  // Print line to console
                 }
-                fclose(fp);  // close file after reading
+                fclose(fp);  // Close file after reading
             }
             break;
 
-        // option 2: search Calls to Action by category
+            // Option 2: Search Calls to Action by category
         case 2:
-            fp = fopen("calls_to_action.txt", "r");  // open file for reading
-
+            fp = fopen("calls_to_action.txt", "r");  // Open file in read mode
             if (fp == NULL) {
-                printf("Error: File cannot be opened.\n");
+                printf("Error: File cannot be opened.\n");  // Error if file not found
             }
             else {
                 printf("Enter category: ");
-                fgets(searchCategory, 50, stdin);   // read input safely
-                trimNewline(searchCategory);        // remove newline from input
-                toLowerCase(searchCategory);        // convert input to lowercase
+                gets(searchCategory);              // Read category input from user
+                toLowerCase(searchCategory);       // Convert input to lowercase for case-insensitive search
 
-                found = 0;  // reset found flag
+                found = 0;  // Reset found flag
 
-                // read file line by line
-                while (fgets(line, MAX_LINE, fp) != NULL) {
-                    strcpy(tempLine, line);              // copy line to preserve original
-                    strtok(tempLine, "|");               // skip first field (number)
-                    strcpy(category, strtok(NULL, "|")); // extract category field
-                    toLowerCase(category);               // convert to lowercase
+                while (fgets(line, MAX_LINE, fp) != NULL) {  // Read each line
+                    strcpy(tempLine, line);               // Copy line to temp buffer for tokenization
+                    strtok(tempLine, "|");                // Skip first field (Call number)
+                    strcpy(category, strtok(NULL, "|"));  // Extract category field
+                    toLowerCase(category);                // Convert category to lowercase
 
-                    // compare user input with category in file
-                    if (strcmp(category, searchCategory) == 0) {
-                        printf("%s", line);  // print matching line
-                        found = 1;           // set found flag
+                    if (strcmp(category, searchCategory) == 0) {  // Compare user input with category
+                        printf("%s", line);  // Print matching line
+                        found = 1;           // Set found flag
                     }
                 }
 
-                // if no matches found
-                if (found == 0) {
+                if (found == 0) {  // If no matches found
                     printf("No records found.\n");
                 }
 
-                fclose(fp);  // close file after search
+                fclose(fp);  // Close file after search
             }
             break;
 
-        // option 3: count total number of Calls to Action
+            // Option 3: Count total number of Calls to Action
         case 3:
-            fp = fopen("calls_to_action.txt", "r");  // open file for reading
-
+            fp = fopen("calls_to_action.txt", "r");  // Open file in read mode
             if (fp == NULL) {
-                printf("Error: File cannot be opened.\n");
+                printf("Error: File cannot be opened.\n");  // Error if file not found
             }
             else {
-                total = 0;  // reset total counter
-                // loop through file counting lines
-                while (fgets(line, MAX_LINE, fp) != NULL) {
+                total = 0;  // Reset total counter
+                while (fgets(line, MAX_LINE, fp) != NULL) {  // Count each line
                     total++;
                 }
-
-                printf("Total number of Calls to Action: %d\n", total);  // display total
-                fclose(fp);  // close file
+                printf("Total number of Calls to Action: %d\n", total);  // Display total
+                fclose(fp);  // Close file after counting
             }
             break;
 
-        // option 4: save Calls to Action by category to a new file
+            // Option 4: Save Calls to Action by category to a new file
         case 4:
-            fp = fopen("calls_to_action.txt", "r");  // open file for reading
-
+            fp = fopen("calls_to_action.txt", "r");  // Open file in read mode
             if (fp == NULL) {
-                printf("Error: File cannot be opened.\n");
+                printf("Error: File cannot be opened.\n");  // Error if file not found
             }
             else {
                 printf("Enter category: ");
-                fgets(searchCategory, 50, stdin);   // read category safely
-                trimNewline(searchCategory);        // remove trailing newline
-                toLowerCase(searchCategory);        // normalize to lowercase
+                gets(searchCategory);             // Read category input from user
+                toLowerCase(searchCategory);      // Convert input to lowercase
 
-                // create output filename using category
-                strcpy(filename, searchCategory);
-                strcat(filename, "_calls.txt");     // append suffix to filename
+                strcpy(filename, searchCategory);   // Build output filename
+                strcat(filename, "_calls.txt");     // Append suffix
 
-                outFile = fopen(filename, "w");     // open output file for writing
-
+                outFile = fopen(filename, "w");  // Open output file in write mode
                 if (outFile == NULL) {
-                    printf("Error: Output file could not be created.\n");
+                    printf("Error: Output file could not be created.\n");  // Error if cannot write
                 }
                 else {
-                    found = 0;  // reset found flag
+                    found = 0;  // Reset found flag
 
-                    // read input file line by line
-                    while (fgets(line, MAX_LINE, fp) != NULL) {
-                        strcpy(tempLine, line);              // copy line for safe tokenization
-                        strtok(tempLine, "|");               // skip first field (number)
-                        strcpy(category, strtok(NULL, "|")); // extract category
-                        toLowerCase(category);               // convert to lowercase
+                    while (fgets(line, MAX_LINE, fp) != NULL) {  // Read input file line by line
+                        strcpy(tempLine, line);               // Copy line to temp
+                        strtok(tempLine, "|");                // Skip first field (Call number)
+                        strcpy(category, strtok(NULL, "|"));  // Extract category field
+                        toLowerCase(category);                // Convert category to lowercase
 
-                        // if category matches user input, write line to new file
-                        if (strcmp(category, searchCategory) == 0) {
-                            fprintf(outFile, "%s", line);  // write matching line
-                            found = 1;                      // set found flag
+                        if (strcmp(category, searchCategory) == 0) {  // If category matches user input
+                            fprintf(outFile, "%s", line);  // Write matching line to output file
+                            found = 1;                     // Set found flag
                         }
                     }
 
-                    // inform user about result
-                    if (found == 1) {
+                    if (found == 1) {  // If matches were found and saved
                         printf("Matching calls saved to %s\n", filename);
                     }
-                    else {
+                    else {  // If no matches found
                         printf("No matching records found.\n");
                     }
 
-                    fclose(outFile);  // close output file
+                    fclose(outFile);  // Close output file
                 }
 
-                fclose(fp);  // close input file
+                fclose(fp);  // Close input file
             }
             break;
 
-        // option 5: exit program
+            // Option 5: Exit program
         case 5:
             printf("Exiting program. Goodbye!\n");
-            keepRunning = 0;   // stop main menu loop
+            keepRunning = 0;  // Stop main menu loop
             break;
 
-        // default case for invalid menu choice
+            // Default: Invalid menu choice
         default:
-            printf("Invalid choice. Try again.\n");
+            printf("Invalid choice. Try again.\n");  // Print error message
         }
     }
 
-    return 0;  // program ends
+    return 0;  // Program ends
 }
